@@ -20,14 +20,12 @@
 #include <string.h>
 #include "eth_plugin_interface.h"
 
-// All possible selectors of your plugin.
-// EDIT THIS: Enter your selectors here, in the format X(NAME, value)
-// A Xmacro below will create for you:
-//     - an enum named selector_t with every NAME
-//     - a map named SELECTORS associating each NAME with it's value
-#define SELECTORS_LIST(X)                    \
-    X(SWAP_EXACT_ETH_FOR_TOKENS, 0x7ff36ab5) \
-    X(BOILERPLATE_DUMMY_2, 0x13374242)
+#define ADDRESS_STR_LEN 43
+#define ETH1_ADDRESS_WITHDRAWAL_PREFIX 0x01
+
+#define SELECTORS_LIST(X)                              \
+    X(BRICK_TOWERS_DEPOSIT, 0xca0bfcce)                \
+    X(BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT, 0x9aa3033a)
 
 // Xmacro helpers to define the enum and map
 // Do not modify !
@@ -46,27 +44,25 @@ typedef enum selector_e {
 extern const uint32_t SELECTORS[SELECTOR_COUNT];
 
 // Enumeration used to parse the smart contract data.
-// EDIT THIS: Adapt the parameter names here.
 typedef enum {
-    MIN_AMOUNT_RECEIVED = 0,
-    TOKEN_RECEIVED,
-    BENEFICIARY,
-    PATH_OFFSET,
-    PATH_LENGTH,
-    UNEXPECTED_PARAMETER,
+    PUBKEYS_ARRAY = 0,
+    WITHDRAWAL_CREDENTIALS_ARRAY,
+    WITHDRAWAL_CREDENTIALS_ARRAY_LENGTH,
+    WITHDRAWAL_CREDENTIALS_OFFSET,
+    WITHDRAWAL_CREDENTIALS_LENGTH,
+    WITHDRAWAL_CREDENTIALS,
+    REMAINING_PARAMETERS,
 } parameter;
 
 // Shared global memory with Ethereum app. Must be at most 5 * 32 bytes.
-// EDIT THIS: This struct is used by your plugin to save the parameters you parse. You
-// will need to adapt this struct to your plugin.
 typedef struct context_s {
     // For display.
-    uint8_t amount_received[INT256_LENGTH];
-    uint8_t beneficiary[ADDRESS_LENGTH];
-    uint8_t token_received[ADDRESS_LENGTH];
-    char ticker[MAX_TICKER_LEN];
-    uint8_t decimals;
-    uint8_t token_found;
+    uint16_t validators_count;
+    uint8_t withdrawal_credentials[PARAMETER_LENGTH];
+    bool withdrawal_credentials_stored;
+    bool withdrawal_credentials_mixed;
+
+    uint8_t withdrawal_address[ADDRESS_LENGTH];
 
     // For parsing data.
     uint8_t next_param;  // Set to be the next param we expect to parse.

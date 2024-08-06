@@ -2,38 +2,37 @@
 [![Compilation & tests](https://github.com/LedgerHQ/app-plugin-boilerplate/actions/workflows/build_and_functional_tests.yml/badge.svg?branch=develop)](https://github.com/LedgerHQ/app-plugin-boilerplate/actions/workflows/build_and_functional_tests.yml)
 
 
-# app-plugin-boilerplate
+# app-plugin-bricktowers
 
-This repo is meant to be a forkable example of a plugin.
-
-Plugins are lightweight applications that go hand-in-hand with the Ethereum
-Application on a Nano (S plus, X), Stax and Flex devices.
-
-They allow users to safely interact with smart contracts by parsing the
-transaction data and displaying its content in a human-readable way. This is
-done on a "per contract" basis, meaning a plugin is required for every DApp.
-
-The code has been commented, and special "EDIT THIS" comments indicate where
-developers are expected to adapt the code to their own needs.
-
-It is STRONGLY recommended to follow the
-[plugin guide](https://developers.ledger.com/docs/dapp/embedded-plugin/code-overview/)
-in order to better understand the flow and the context for plugins.
-
-## Ethereum SDK
-
-Ethereum plugins need the [Ethereum SDK](https://github.com/LedgerHQ/ethereum-plugin-sdk).
-You can use the `ETHEREUM_PLUGIN_SDK` variable to point to the directory where you cloned
-this repository. By default, the `Makefile` expects it to be at the root directory of this
-plugin repository by the `ethereum-plugin-sdk` name.
-
-You can see that this [CI](https://github.com/LedgerHQ/app-plugin-boilerplate/blob/develop/.github/workflows/check_sdk.yml) workflow
-verifies that the SDK used is either on the latest `master` or `develop` references. This ensures
-the code is compiled and tested on the latest version of the SDK.
+This plug-in is compatible with Nano S / X, Flex and Stax devices, it enables to
+interact in a secure way with the Brick Towers staking contracts.
 
 ## Documentation
 
-The documentation about the plugin shall be added in [PLUGIN_SPECIFICATON.md](https://github.com/LedgerHQ/app-plugin-boilerplate/blob/develop/PLUGIN_SPECIFICATION.md). It shall includes at least the smart contracts and functions supported by the plugin.
+The documentation is defined in [PLUGIN_SPECIFICATON.md](https://github.com/LedgerHQ/app-plugin-boilerplate/blob/develop/PLUGIN_SPECIFICATION.md).
+
+## Clearsigning
+
+### Brick Towers - Batch Deposit
+
+Function: `deposit()`
+Clearsigned:
+
+- tx.value
+
+![](/tests/snapshots/nanosp/test_single_validator/00000.png) ![](/tests/snapshots/nanosp/test_single_validator/00001.png) ![](/tests/snapshots/nanosp/test_single_validator/00002.png) ![](/tests/snapshots/nanosp/test_single_validator/00003.png) ![](/tests/snapshots/nanosp/test_single_validator/00004.png) ![](/tests/snapshots/nanosp/test_single_validator/00005.png)
+
+![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00000.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00001.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00002.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00003.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00004.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00005.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00006.png)
+
+
+### Brick Towers - Request Voluntary Exit
+
+Function: `requestVoluntaryExit()`
+Clearsigned:
+
+- none as BLS key is not digest to display on device and only owner of the validator can withdraw on its behalf so no attack vector possible.
+
+![](/tests/snapshots/nanosp/test_request_single_validator/00000.png) ![](/tests/snapshots/nanosp/test_request_single_validator/00001.png) ![](/tests/snapshots/nanosp/test_request_single_validator/00002.png) ![](/tests/snapshots/nanosp/test_request_single_validator/00003.png) ![](/tests/snapshots/nanosp/test_request_single_validator/00004.png) ![](/tests/snapshots/nanosp/test_request_single_validator/00005.png)
 
 ## Formatting
 
