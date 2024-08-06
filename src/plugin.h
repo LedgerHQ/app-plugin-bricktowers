@@ -20,11 +20,11 @@
 #include <string.h>
 #include "eth_plugin_interface.h"
 
-#define ADDRESS_STR_LEN 43
+#define ADDRESS_STR_LEN                43
 #define ETH1_ADDRESS_WITHDRAWAL_PREFIX 0x01
 
-#define SELECTORS_LIST(X)                              \
-    X(BRICK_TOWERS_DEPOSIT, 0xca0bfcce)                \
+#define SELECTORS_LIST(X)               \
+    X(BRICK_TOWERS_DEPOSIT, 0xca0bfcce) \
     X(BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT, 0x9aa3033a)
 
 // Xmacro helpers to define the enum and map

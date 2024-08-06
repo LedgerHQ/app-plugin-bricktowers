@@ -18,8 +18,8 @@ static void handle_request_voluntary_exit(ethPluginProvideParameter_t *msg, cont
             context->go_to_offset = true;
             break;
         case REMAINING_PARAMETERS:
-           break;
-     }
+            break;
+    }
 }
 
 static void handle_deposit(ethPluginProvideParameter_t *msg, context_t *context) {

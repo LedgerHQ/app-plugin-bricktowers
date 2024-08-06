@@ -49,7 +49,10 @@ static bool set_withdrawal_address_warning_screen(ethQueryContractUI_t *msg, con
 static bool set_withdrawal_address_screen(ethQueryContractUI_t *msg, context_t *context) {
     set_screen_title(msg, "Withdrawal Address");
     char address_buffer[ADDRESS_STR_LEN];
-    getEthDisplayableAddress(context->withdrawal_address, address_buffer, sizeof(address_buffer), 0);
+    getEthDisplayableAddress(context->withdrawal_address,
+                             address_buffer,
+                             sizeof(address_buffer),
+                             0);
     set_screen_message(msg, address_buffer);
     return true;
 }
@@ -91,7 +94,6 @@ bool request_voluntary_exit_ui(ethQueryContractUI_t *msg) {
     return ret;
 }
 
-
 void handle_query_contract_ui(ethQueryContractUI_t *msg) {
     context_t *context = (context_t *) msg->pluginContext;
     bool result = false;
@@ -103,11 +105,11 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
     switch (context->selectorIndex) {
         case BRICK_TOWERS_DEPOSIT:
             result = deposit_ui(msg, context);
-        break;
+            break;
 
         case BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT:
             result = request_voluntary_exit_ui(msg);
-        break;
+            break;
     }
 
     msg->result = result ? ETH_PLUGIN_RESULT_OK : ETH_PLUGIN_RESULT_ERROR;
