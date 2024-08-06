@@ -110,6 +110,11 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
         case BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT:
             result = request_voluntary_exit_ui(msg);
             break;
+
+        default:
+            PRINTF("Selector index is not supported: %d\n", context->selectorIndex);
+            result = false;
+            break;
     }
 
     msg->result = result ? ETH_PLUGIN_RESULT_OK : ETH_PLUGIN_RESULT_ERROR;
