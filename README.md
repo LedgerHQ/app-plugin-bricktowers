@@ -32,7 +32,7 @@ Clearsigned:
 ##### BLS key as withdrawal credentials
 Not supported, fallback to Ethereum plugin
 
-##### Mixed (multiple different credentials) withdrawal credentials within batch transaction
+##### Mixed (multiple different) withdrawal credentials within batch transaction
 Not supported, fallback to Ethereum plugin
 
 ### Brick Towers - Request Voluntary Exit
