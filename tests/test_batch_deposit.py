@@ -5,10 +5,11 @@ import os
 from web3 import Web3
 from eth_typing import ChainId
 
-from ledger_app_clients.ethereum.client import EthAppClient
+from ledger_app_clients.ethereum.client import EthAppClient, StatusWord
 import ledger_app_clients.ethereum.response_parser as ResponseParser
 from ledger_app_clients.ethereum.utils import recover_transaction
 from ragger.navigator import NavInsID
+from ragger.error import ExceptionRAPDU
 
 from .utils import get_appname_from_makefile, DERIVATION_PATH
 
@@ -87,6 +88,31 @@ def sign_and_verify_transaction(client, firmware, navigator,  test_name, transac
     # Assert that the recovered address matches the wallet address
     assert addr == wallet_addr.get()
 
+def reject_transaction(backend, firmware, navigator, test_name, transaction, wallet_addr):
+    client = EthAppClient(backend)
+    # Sign the transaction
+    try:
+        with client.sign(DERIVATION_PATH, transaction):
+
+            # Navigate and compare depending on the device type
+            if firmware.is_nano:
+                navigator.navigate_until_text_and_compare(
+                    NavInsID.RIGHT_CLICK,
+                    [NavInsID.BOTH_CLICK],
+                    "Reject",
+                    ROOT_SCREENSHOT_PATH,
+                    test_name
+                )
+            else:
+                navigator.navigate_and_compare(
+                    ROOT_SCREENSHOT_PATH,
+                    test_name,
+                    [NavInsID.USE_CASE_CHOICE_CONFIRM]
+                )
+    except ExceptionRAPDU as e:
+        assert e.status == StatusWord.INVALID_DATA
+    else:
+        assert False
 
 def test_single_validator(backend, firmware, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
@@ -120,7 +146,7 @@ def test_single_validator_bls_credential(backend, firmware, navigator, test_name
 
     client.set_external_plugin(PLUGIN_NAME,contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr)
+    reject_transaction(backend, firmware, navigator, test_name, transaction, wallet_addr)
 
 
 def test_multiple_validators(backend, firmware, navigator, test_name, wallet_addr):
@@ -158,7 +184,7 @@ def test_multiple_validators_different_withdrawal_bls(backend, firmware, navigat
 
     client.set_external_plugin(PLUGIN_NAME, contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr)
+    reject_transaction(backend, firmware, navigator, test_name, transaction, wallet_addr)
 
 def test_multiple_validators_multiple_mixed_withdrawal_addresses(backend, firmware, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
@@ -174,7 +200,7 @@ def test_multiple_validators_multiple_mixed_withdrawal_addresses(backend, firmwa
 
     client.set_external_plugin(PLUGIN_NAME,contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr)
+    reject_transaction(backend, firmware, navigator, test_name, transaction, wallet_addr)
 
 def test_multiple_validators_multiple_mixed_withdrawal_addresses_bls_key(backend, firmware, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
@@ -190,4 +216,4 @@ def test_multiple_validators_multiple_mixed_withdrawal_addresses_bls_key(backend
 
     client.set_external_plugin(PLUGIN_NAME,contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr)
+    reject_transaction(backend, firmware, navigator, test_name, transaction, wallet_addr)

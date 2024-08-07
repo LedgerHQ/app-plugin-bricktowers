@@ -20,10 +20,20 @@ Clearsigned:
 
 - tx.value
 
+##### Single validator deposit
 ![](/tests/snapshots/nanosp/test_single_validator/00000.png) ![](/tests/snapshots/nanosp/test_single_validator/00001.png) ![](/tests/snapshots/nanosp/test_single_validator/00002.png) ![](/tests/snapshots/nanosp/test_single_validator/00003.png) ![](/tests/snapshots/nanosp/test_single_validator/00004.png) ![](/tests/snapshots/nanosp/test_single_validator/00005.png)
 
+##### Multiple validators deposit
+![](/tests/snapshots/nanosp/test_multiple_validators/00000.png) ![](/tests/snapshots/nanosp/test_multiple_validators/00001.png) ![](/tests/snapshots/nanosp/test_multiple_validators/00002.png) ![](/tests/snapshots/nanosp/test_multiple_validators/00003.png) ![](/tests/snapshots/nanosp/test_multiple_validators/00004.png) ![](/tests/snapshots/nanosp/test_multiple_validators/00005.png)
+
+##### Withdrawal address differs from the connected address
 ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00000.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00001.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00002.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00003.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00004.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00005.png) ![](/tests/snapshots/nanosp/test_multiple_validators_different_withdrawal/00006.png)
 
+##### BLS key as withdrawal credentials
+Not supported, fallback to Ethereum plugin
+
+##### Mixed (multiple different credentials) withdrawal credentials within batch transaction
+Not supported, fallback to Ethereum plugin
 
 ### Brick Towers - Request Voluntary Exit
 

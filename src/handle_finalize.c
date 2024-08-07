@@ -22,15 +22,18 @@ void handle_finalize(ethPluginFinalize_t *msg) {
             }
 
             if (context->withdrawal_credentials_mixed) {
-                msg->numScreens += 1;
+                msg->result = ETH_PLUGIN_RESULT_FALLBACK;
             } else if (!withdrawal_address_matches_sender(msg)) {
                 if (context->withdrawal_credentials[0] == ETH1_ADDRESS_WITHDRAWAL_PREFIX) {
                     msg->numScreens += 2;
+                    msg->result = ETH_PLUGIN_RESULT_OK;
                 } else {
-                    msg->numScreens += 1;
+                    msg->result = ETH_PLUGIN_RESULT_FALLBACK;
                 }
+            } else {
+                msg->result = ETH_PLUGIN_RESULT_OK;
             }
-            msg->result = ETH_PLUGIN_RESULT_OK;
+
             break;
 
         case BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT:
