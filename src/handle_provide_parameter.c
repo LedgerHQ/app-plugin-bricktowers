@@ -4,24 +4,6 @@ static bool withdrawal_credentials_match(ethPluginProvideParameter_t *msg, conte
     return memcmp(context->withdrawal_credentials, msg->parameter, PARAMETER_LENGTH) == 0;
 }
 
-static void handle_request_voluntary_exit(ethPluginProvideParameter_t *msg, context_t *context) {
-    if (context->go_to_offset) {
-        if (msg->parameterOffset != context->offset) {
-            return;
-        }
-        context->go_to_offset = false;
-    }
-
-    switch (context->next_param) {
-        case PUBKEYS_ARRAY:
-            context->next_param = REMAINING_PARAMETERS;
-            context->go_to_offset = true;
-            break;
-        case REMAINING_PARAMETERS:
-            break;
-    }
-}
-
 static void handle_deposit(ethPluginProvideParameter_t *msg, context_t *context) {
     if (context->go_to_offset) {
         if (msg->parameterOffset != context->offset) {
@@ -116,7 +98,7 @@ void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
             break;
 
         case BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT:
-            handle_request_voluntary_exit(msg, context);
+            // no parameters to handle
             break;
         default:
             PRINTF("Selector Index not supported: %d\n", context->selectorIndex);
