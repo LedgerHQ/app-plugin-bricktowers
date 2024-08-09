@@ -44,6 +44,43 @@ Clearsigned:
 
 ![](/tests/snapshots/nanosp/test_request_single_validator/00000.png) ![](/tests/snapshots/nanosp/test_request_single_validator/00001.png) ![](/tests/snapshots/nanosp/test_request_single_validator/00002.png) ![](/tests/snapshots/nanosp/test_request_single_validator/00003.png) ![](/tests/snapshots/nanosp/test_request_single_validator/00004.png) ![](/tests/snapshots/nanosp/test_request_single_validator/00005.png)
 
+### Brick Towers - Pooled Staking - Deposit
+
+Function: `deposit()`
+Clearsigned:
+
+- tx.value
+
+![](/tests/snapshots/nanosp/test_pooled_deposit/00000.png) ![](/tests/snapshots/nanosp/test_pooled_deposit/00001.png) ![](/tests/snapshots/nanosp/test_pooled_deposit/00002.png) ![](/tests/snapshots/nanosp/test_pooled_deposit/00003.png) ![](/tests/snapshots/nanosp/test_pooled_deposit/00004.png) ![](/tests/snapshots/nanosp/test_pooled_deposit/00005.png)
+
+### Brick Towers - Pooled Staking - Update State
+
+Function: `updateState()`
+Clearsigned:
+
+- transaction type = Update State
+
+![](/tests/snapshots/nanosp/test_pooled_simple_update_state/00000.png) ![](/tests/snapshots/nanosp/test_pooled_simple_update_state/00001.png) ![](/tests/snapshots/nanosp/test_pooled_simple_update_state/00002.png) ![](/tests/snapshots/nanosp/test_pooled_simple_update_state/00003.png) ![](/tests/snapshots/nanosp/test_pooled_simple_update_state/00004.png) ![](/tests/snapshots/nanosp/test_pooled_simple_update_state/00005.png)
+
+### Brick Towers - Pooled Staking - Deposit through multicall
+
+Function: `multicall()`
+Clearsigned:
+
+- deposit transaction is extracted
+
+![](/tests/snapshots/nanosp/test_pooled_simple_multicall_deposit/00000.png) ![](/tests/snapshots/nanosp/test_pooled_simple_multicall_deposit/00001.png) ![](/tests/snapshots/nanosp/test_pooled_simple_multicall_deposit/00002.png) ![](/tests/snapshots/nanosp/test_pooled_simple_multicall_deposit/00003.png) ![](/tests/snapshots/nanosp/test_pooled_simple_multicall_deposit/00004.png) ![](/tests/snapshots/nanosp/test_pooled_simple_multicall_deposit/00005.png)
+
+### Brick Towers - Pooled Staking - Claim Exited Assets through multicall
+
+Function: `multicall()`
+Clearsigned:
+
+- "Claim Exited Assets" transaction is extracted
+
+![](/tests/snapshots/nanosp/test_pooled_simple_multicall_claim_exit/00000.png) ![](/tests/snapshots/nanosp/test_pooled_simple_multicall_claim_exit/00001.png) ![](/tests/snapshots/nanosp/test_pooled_simple_multicall_claim_exit/00002.png) ![](/tests/snapshots/nanosp/test_pooled_simple_multicall_claim_exit/00003.png) ![](/tests/snapshots/nanosp/test_pooled_simple_multicall_claim_exit/00004.png) ![](/tests/snapshots/nanosp/test_pooled_simple_multicall_claim_exit/00005.png)
+
+
 ## Formatting
 
 The C source code is expected to be formatted with `clang-format` 11.0.0 or higher.

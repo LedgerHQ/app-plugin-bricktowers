@@ -21,11 +21,22 @@
 #include "eth_plugin_interface.h"
 
 #define ADDRESS_STR_LEN                43
+#define POOLED_SCREEN_NAME_LEN         32
+#define MAX_MULTICALL_ELEMENTS         16
 #define ETH1_ADDRESS_WITHDRAWAL_PREFIX 0x01
 
-#define SELECTORS_LIST(X)               \
-    X(BRICK_TOWERS_DEPOSIT, 0xca0bfcce) \
-    X(BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT, 0x9aa3033a)
+#define SELECTORS_LIST(X)                                       \
+    X(BRICK_TOWERS_DEPOSIT, 0xca0bfcce)                         \
+    X(BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT, 0x9aa3033a)          \
+    X(BRICK_TOWERS_POOLED_DEPOSIT, 0xf9609f08)                  \
+    X(BRICK_TOWERS_POOLED_MULTICALL, 0xac9650d8)                \
+    X(BRICK_TOWERS_POOLED_MINT_OS_TOKEN, 0x201b9eb5)            \
+    X(BRICK_TOWERS_POOLED_BURN_OS_TOKEN, 0x066055e0)            \
+    X(BRICK_TOWERS_POOLED_ENTER_EXIT_QUEUE, 0x8ceab9aa)         \
+    X(BRICK_TOWERS_POOLED_CLAIM_EXITED_ASSETS, 0x8697d2c2)      \
+    X(BRICK_TOWERS_POOLED_UPDATE_STATE, 0x1a7ff553)             \
+    X(BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT, 0x18f72950) \
+    X(BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT_AND_MINT_TOKEN, 0x01d523b6)
 
 // Xmacro helpers to define the enum and map
 // Do not modify !
@@ -51,6 +62,11 @@ typedef enum {
     WITHDRAWAL_CREDENTIALS_OFFSET,
     WITHDRAWAL_CREDENTIALS_LENGTH,
     WITHDRAWAL_CREDENTIALS,
+    MULTICALL_ARRAY,
+    MULTICALL_ARRAY_LENGTH,
+    MULTICALL_ELEMENT_LENGTH,
+    MULTICALL_ARRAY_OFFSET,
+    MULTICALL_METHOD_SELECTOR,
     REMAINING_PARAMETERS,
 } parameter;
 
@@ -59,10 +75,14 @@ typedef struct context_s {
     // For display.
     uint16_t validators_count;
     uint8_t withdrawal_credentials[PARAMETER_LENGTH];
+    uint16_t multicall_count;
+    uint16_t current_multicall_index;
+    uint16_t multicall_offsets[MAX_MULTICALL_ELEMENTS];
     bool withdrawal_credentials_stored;
     bool withdrawal_credentials_mixed;
 
     uint8_t withdrawal_address[ADDRESS_LENGTH];
+    char pooled_screen_name[POOLED_SCREEN_NAME_LEN];
 
     // For parsing data.
     uint8_t next_param;  // Set to be the next param we expect to parse.

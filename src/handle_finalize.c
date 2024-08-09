@@ -35,7 +35,18 @@ void handle_finalize(ethPluginFinalize_t *msg) {
             }
 
             break;
-
+        case BRICK_TOWERS_POOLED_DEPOSIT:
+            msg->numScreens = 1;
+            msg->result = ETH_PLUGIN_RESULT_OK;
+            break;
+        case BRICK_TOWERS_POOLED_MULTICALL:
+        case BRICK_TOWERS_POOLED_MINT_OS_TOKEN:
+        case BRICK_TOWERS_POOLED_BURN_OS_TOKEN:
+        case BRICK_TOWERS_POOLED_ENTER_EXIT_QUEUE:
+        case BRICK_TOWERS_POOLED_CLAIM_EXITED_ASSETS:
+        case BRICK_TOWERS_POOLED_UPDATE_STATE:
+        case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT:
+        case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT_AND_MINT_TOKEN:
         case BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT:
             msg->numScreens = 1;
             msg->result = ETH_PLUGIN_RESULT_OK;

@@ -40,9 +40,26 @@ void handle_init_contract(ethPluginInitContract_t *msg) {
     // Set `next_param` to be the first field we expect to parse.
     switch (context->selectorIndex) {
         case BRICK_TOWERS_DEPOSIT:
-            context->next_param = PUBKEYS_ARRAY;
             break;
-
+        case BRICK_TOWERS_POOLED_DEPOSIT:
+            break;
+        case BRICK_TOWERS_POOLED_MINT_OS_TOKEN:
+            break;
+        case BRICK_TOWERS_POOLED_BURN_OS_TOKEN:
+            break;
+        case BRICK_TOWERS_POOLED_ENTER_EXIT_QUEUE:
+            break;
+        case BRICK_TOWERS_POOLED_CLAIM_EXITED_ASSETS:
+            break;
+        case BRICK_TOWERS_POOLED_UPDATE_STATE:
+            break;
+        case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT:
+            break;
+        case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT_AND_MINT_TOKEN:
+            break;
+        case BRICK_TOWERS_POOLED_MULTICALL:
+            context->next_param = MULTICALL_ARRAY;
+            break;
         case BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT:
             break;
         default:

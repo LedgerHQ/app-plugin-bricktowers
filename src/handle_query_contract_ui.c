@@ -57,7 +57,7 @@ static bool set_withdrawal_address_screen(ethQueryContractUI_t *msg, context_t *
     return true;
 }
 
-static bool deposit_ui(ethQueryContractUI_t *msg, context_t *context) {
+static bool native_deposit_ui(ethQueryContractUI_t *msg, context_t *context) {
     bool result = false;
     switch (msg->screenIndex) {
         case 0:
@@ -70,6 +70,34 @@ static bool deposit_ui(ethQueryContractUI_t *msg, context_t *context) {
 
         case 2:
             result = set_withdrawal_address_screen(msg, context);
+            break;
+
+        default:
+            PRINTF("Received an invalid screenIndex\n");
+    }
+    return result;
+}
+
+static bool pooled_deposit_ui(ethQueryContractUI_t *msg, context_t *context) {
+    bool result = false;
+    switch (msg->screenIndex) {
+        case 0:
+            result = set_amount_screen(msg);
+            break;
+
+        default:
+            PRINTF("Received an invalid screenIndex\n");
+    }
+    return result;
+}
+
+static bool pooled_otherwise(ethQueryContractUI_t *msg, context_t *context) {
+    bool result = false;
+    switch (msg->screenIndex) {
+        case 0:
+            set_screen_title(msg, "Transaction");
+            set_screen_message(msg, context->pooled_screen_name);
+            result = true;
             break;
 
         default:
@@ -104,13 +132,34 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
 
     switch (context->selectorIndex) {
         case BRICK_TOWERS_DEPOSIT:
-            result = deposit_ui(msg, context);
+            result = native_deposit_ui(msg, context);
             break;
-
         case BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT:
             result = request_voluntary_exit_ui(msg);
             break;
-
+        case BRICK_TOWERS_POOLED_DEPOSIT:
+            result = pooled_deposit_ui(msg, context);
+            break;
+        case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT:
+            result = pooled_deposit_ui(msg, context);
+            break;
+        case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT_AND_MINT_TOKEN:
+            result = pooled_deposit_ui(msg, context);
+            break;
+        case BRICK_TOWERS_POOLED_MULTICALL:
+            if (strcmp(context->pooled_screen_name, "Deposit") == 0) {
+                result = pooled_deposit_ui(msg, context);
+            } else {
+                result = pooled_otherwise(msg, context);
+            }
+            break;
+        case BRICK_TOWERS_POOLED_MINT_OS_TOKEN:
+        case BRICK_TOWERS_POOLED_BURN_OS_TOKEN:
+        case BRICK_TOWERS_POOLED_ENTER_EXIT_QUEUE:
+        case BRICK_TOWERS_POOLED_CLAIM_EXITED_ASSETS:
+        case BRICK_TOWERS_POOLED_UPDATE_STATE:
+            result = pooled_otherwise(msg, context);
+            break;
         default:
             PRINTF("Selector index is not supported: %d\n", context->selectorIndex);
             result = false;
