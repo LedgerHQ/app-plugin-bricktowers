@@ -44,7 +44,6 @@ void handle_init_contract(ethPluginInitContract_t *msg) {
             break;
 
         case BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT:
-            context->next_param = PUBKEYS_ARRAY;
             break;
         default:
             PRINTF("Missing selectorIndex: %d\n", context->selectorIndex);
