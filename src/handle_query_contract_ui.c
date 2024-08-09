@@ -78,7 +78,7 @@ static bool native_deposit_ui(ethQueryContractUI_t *msg, context_t *context) {
     return result;
 }
 
-static bool pooled_deposit_ui(ethQueryContractUI_t *msg, context_t *context) {
+static bool pooled_deposit_ui(ethQueryContractUI_t *msg) {
     bool result = false;
     switch (msg->screenIndex) {
         case 0:
@@ -138,17 +138,17 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
             result = request_voluntary_exit_ui(msg);
             break;
         case BRICK_TOWERS_POOLED_DEPOSIT:
-            result = pooled_deposit_ui(msg, context);
+            result = pooled_deposit_ui(msg);
             break;
         case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT:
-            result = pooled_deposit_ui(msg, context);
+            result = pooled_deposit_ui(msg);
             break;
         case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT_AND_MINT_TOKEN:
-            result = pooled_deposit_ui(msg, context);
+            result = pooled_deposit_ui(msg);
             break;
         case BRICK_TOWERS_POOLED_MULTICALL:
             if (strcmp(context->pooled_screen_name, "Deposit") == 0) {
-                result = pooled_deposit_ui(msg, context);
+                result = pooled_deposit_ui(msg);
             } else {
                 result = pooled_otherwise(msg, context);
             }
