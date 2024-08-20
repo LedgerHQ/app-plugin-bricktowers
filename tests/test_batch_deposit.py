@@ -96,12 +96,10 @@ def reject_transaction(backend, firmware, navigator, test_name, transaction, wal
 
             # Navigate and compare depending on the device type
             if firmware.is_nano:
-                navigator.navigate_until_text_and_compare(
-                    NavInsID.RIGHT_CLICK,
-                    [NavInsID.BOTH_CLICK],
-                    "Reject",
+                navigator.navigate_and_compare(
                     ROOT_SCREENSHOT_PATH,
-                    test_name
+                    test_name,
+                    [NavInsID.BOTH_CLICK]
                 )
             else:
                 navigator.navigate_and_compare(
