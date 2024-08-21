@@ -1,12 +1,19 @@
 #include "plugin.h"
 
-// EDIT THIS: You need to adapt / remove the static functions (set_send_ui, set_receive_ui ...) to
-// match what you wish to display.
+static void set_screen_title(ethQueryContractUI_t *msg, const char *title) {
+    if (strlcpy(msg->title, title, msg->titleLength) < strlen(title)) {
+        PRINTF("Screen title truncated: %s\n", msg->title);
+    }
+}
 
-// Set UI for the "Send" screen.
-// EDIT THIS: Adapt / remove this function to your needs.
-static bool set_send_ui(ethQueryContractUI_t *msg) {
-    strlcpy(msg->title, "Send", msg->titleLength);
+static void set_screen_message(ethQueryContractUI_t *msg, const char *message) {
+    if (strlcpy(msg->msg, message, msg->msgLength) < strlen(message)) {
+        PRINTF("Screen message truncated: %s\n", msg->msg);
+    }
+}
+
+static bool set_amount_screen(ethQueryContractUI_t *msg) {
+    set_screen_title(msg, "Amount");
 
     const uint8_t *eth_amount = msg->pluginSharedRO->txContent->value.value;
     uint8_t eth_amount_size = msg->pluginSharedRO->txContent->value.length;
@@ -21,74 +28,143 @@ static bool set_send_ui(ethQueryContractUI_t *msg) {
                           msg->msgLength);
 }
 
-// Set UI for "Receive" screen.
-// EDIT THIS: Adapt / remove this function to your needs.
-static bool set_receive_ui(ethQueryContractUI_t *msg, const context_t *context) {
-    strlcpy(msg->title, "Receive Min.", msg->titleLength);
-
-    uint8_t decimals = context->decimals;
-    const char *ticker = context->ticker;
-
-    // If the token look up failed, use the default network ticker along with the default decimals.
-    if (!context->token_found) {
-        decimals = WEI_TO_ETHER;
-        ticker = msg->network_ticker;
+static bool set_withdrawal_address_warning_screen(ethQueryContractUI_t *msg, context_t *context) {
+    if (context->withdrawal_credentials_mixed) {
+        set_screen_title(msg, "Funds at risk");
+        set_screen_message(msg, "Withdrawal credentials are mixed.");
+        return true;
+    } else {
+        if (context->withdrawal_credentials[0] == ETH1_ADDRESS_WITHDRAWAL_PREFIX) {
+            set_screen_title(msg, "Please verify");
+            set_screen_message(msg, "Withdrawal address differs from the connected address.");
+            return true;
+        } else {
+            set_screen_title(msg, "Funds at risk");
+            set_screen_message(msg, "Withdrawal credentials are set to a BLS key.");
+            return true;
+        }
     }
-
-    return amountToString(context->amount_received,
-                          sizeof(context->amount_received),
-                          decimals,
-                          ticker,
-                          msg->msg,
-                          msg->msgLength);
 }
 
-// Set UI for "Beneficiary" screen.
-// EDIT THIS: Adapt / remove this function to your needs.
-static bool set_beneficiary_ui(ethQueryContractUI_t *msg, context_t *context) {
-    strlcpy(msg->title, "Beneficiary", msg->titleLength);
+static bool set_withdrawal_address_screen(ethQueryContractUI_t *msg, context_t *context) {
+    set_screen_title(msg, "Withdrawal Address");
+    char address_buffer[ADDRESS_STR_LEN];
+    getEthDisplayableAddress(context->withdrawal_address,
+                             address_buffer,
+                             sizeof(address_buffer),
+                             0);
+    set_screen_message(msg, address_buffer);
+    return true;
+}
 
-    // Prefix the address with `0x`.
-    msg->msg[0] = '0';
-    msg->msg[1] = 'x';
+static bool native_deposit_ui(ethQueryContractUI_t *msg, context_t *context) {
+    bool result = false;
+    switch (msg->screenIndex) {
+        case 0:
+            result = set_amount_screen(msg);
+            break;
 
-    // We need a random chainID for legacy reasons with `getEthAddressStringFromBinary`.
-    // Setting it to `0` will make it work with every chainID :)
-    uint64_t chainid = 0;
+        case 1:
+            result = set_withdrawal_address_warning_screen(msg, context);
+            break;
 
-    // Get the string representation of the address stored in `context->beneficiary`. Put it in
-    // `msg->msg`.
-    return getEthAddressStringFromBinary(
-        context->beneficiary,
-        msg->msg + 2,  // +2 here because we've already prefixed with '0x'.
-        chainid);
+        case 2:
+            result = set_withdrawal_address_screen(msg, context);
+            break;
+
+        default:
+            PRINTF("Received an invalid screenIndex\n");
+    }
+    return result;
+}
+
+static bool pooled_deposit_ui(ethQueryContractUI_t *msg) {
+    bool result = false;
+    switch (msg->screenIndex) {
+        case 0:
+            result = set_amount_screen(msg);
+            break;
+
+        default:
+            PRINTF("Received an invalid screenIndex\n");
+    }
+    return result;
+}
+
+static bool pooled_otherwise(ethQueryContractUI_t *msg, context_t *context) {
+    bool result = false;
+    switch (msg->screenIndex) {
+        case 0:
+            set_screen_title(msg, "Transaction");
+            set_screen_message(msg, context->pooled_screen_name);
+            result = true;
+            break;
+
+        default:
+            PRINTF("Received an invalid screenIndex\n");
+    }
+    return result;
+}
+
+bool request_voluntary_exit_ui(ethQueryContractUI_t *msg) {
+    bool ret = false;
+
+    switch (msg->screenIndex) {
+        case 0:
+            set_screen_title(msg, "Request");
+            set_screen_message(msg, "Validators Withdrawal");
+            ret = true;
+            break;
+        default:
+            PRINTF("Received an invalid screenIndex\n");
+            break;
+    }
+    return ret;
 }
 
 void handle_query_contract_ui(ethQueryContractUI_t *msg) {
     context_t *context = (context_t *) msg->pluginContext;
-    bool ret = false;
-
-    // msg->title is the upper line displayed on the device.
-    // msg->msg is the lower line displayed on the device.
+    bool result = false;
 
     // Clean the display fields.
     memset(msg->title, 0, msg->titleLength);
     memset(msg->msg, 0, msg->msgLength);
 
-    // EDIT THIS: Adapt the cases for the screens you'd like to display.
-    switch (msg->screenIndex) {
-        case 0:
-            ret = set_send_ui(msg);
+    switch (context->selectorIndex) {
+        case BRICK_TOWERS_DEPOSIT:
+            result = native_deposit_ui(msg, context);
             break;
-        case 1:
-            ret = set_receive_ui(msg, context);
+        case BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT:
+            result = request_voluntary_exit_ui(msg);
             break;
-        case 2:
-            ret = set_beneficiary_ui(msg, context);
+        case BRICK_TOWERS_POOLED_DEPOSIT:
+            result = pooled_deposit_ui(msg);
             break;
-        // Keep this
+        case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT:
+            result = pooled_deposit_ui(msg);
+            break;
+        case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT_AND_MINT_TOKEN:
+            result = pooled_deposit_ui(msg);
+            break;
+        case BRICK_TOWERS_POOLED_MULTICALL:
+            if (strcmp(context->pooled_screen_name, "Deposit") == 0) {
+                result = pooled_deposit_ui(msg);
+            } else {
+                result = pooled_otherwise(msg, context);
+            }
+            break;
+        case BRICK_TOWERS_POOLED_MINT_OS_TOKEN:
+        case BRICK_TOWERS_POOLED_BURN_OS_TOKEN:
+        case BRICK_TOWERS_POOLED_ENTER_EXIT_QUEUE:
+        case BRICK_TOWERS_POOLED_CLAIM_EXITED_ASSETS:
+        case BRICK_TOWERS_POOLED_UPDATE_STATE:
+            result = pooled_otherwise(msg, context);
+            break;
         default:
-            PRINTF("Received an invalid screenIndex\n");
+            PRINTF("Selector index is not supported: %d\n", context->selectorIndex);
+            result = false;
+            break;
     }
-    msg->result = ret ? ETH_PLUGIN_RESULT_OK : ETH_PLUGIN_RESULT_ERROR;
+
+    msg->result = result ? ETH_PLUGIN_RESULT_OK : ETH_PLUGIN_RESULT_ERROR;
 }

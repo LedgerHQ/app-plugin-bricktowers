@@ -38,16 +38,30 @@ void handle_init_contract(ethPluginInitContract_t *msg) {
     }
 
     // Set `next_param` to be the first field we expect to parse.
-    // EDIT THIS: Adapt the `cases`, and set the `next_param` to be the first parameter you expect
-    // to parse.
     switch (context->selectorIndex) {
-        case SWAP_EXACT_ETH_FOR_TOKENS:
-            context->next_param = MIN_AMOUNT_RECEIVED;
+        case BRICK_TOWERS_DEPOSIT:
             break;
-        case BOILERPLATE_DUMMY_2:
-            context->next_param = TOKEN_RECEIVED;
+        case BRICK_TOWERS_POOLED_DEPOSIT:
             break;
-        // Keep this
+        case BRICK_TOWERS_POOLED_MINT_OS_TOKEN:
+            break;
+        case BRICK_TOWERS_POOLED_BURN_OS_TOKEN:
+            break;
+        case BRICK_TOWERS_POOLED_ENTER_EXIT_QUEUE:
+            break;
+        case BRICK_TOWERS_POOLED_CLAIM_EXITED_ASSETS:
+            break;
+        case BRICK_TOWERS_POOLED_UPDATE_STATE:
+            break;
+        case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT:
+            break;
+        case BRICK_TOWERS_POOLED_UPDATE_STATE_AND_DEPOSIT_AND_MINT_TOKEN:
+            break;
+        case BRICK_TOWERS_POOLED_MULTICALL:
+            context->next_param = MULTICALL_ARRAY;
+            break;
+        case BRICK_TOWERS_REQUEST_VOLUNTARY_EXIT:
+            break;
         default:
             PRINTF("Missing selectorIndex: %d\n", context->selectorIndex);
             msg->result = ETH_PLUGIN_RESULT_ERROR;
