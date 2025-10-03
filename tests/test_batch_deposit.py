@@ -59,16 +59,16 @@ def generate_batch_deposit_transaction(contract, withdrawal_credentials, num_val
 
     return tx_params
 
-def sign_and_verify_transaction(client, firmware, navigator,  test_name, transaction, wallet_addr):
+def sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr):
     # Sign the transaction
     with client.sign(DERIVATION_PATH, transaction):
 
         # Navigate and compare depending on the device type
-        if firmware.is_nano:
+        if backend.device.is_nano:
             navigator.navigate_until_text_and_compare(
                 NavInsID.RIGHT_CLICK,
                 [NavInsID.BOTH_CLICK],
-                "Accept",
+                "Sign transaction",
                 ROOT_SCREENSHOT_PATH,
                 test_name
             )
@@ -88,14 +88,14 @@ def sign_and_verify_transaction(client, firmware, navigator,  test_name, transac
     # Assert that the recovered address matches the wallet address
     assert addr == wallet_addr.get()
 
-def reject_transaction(backend, firmware, navigator, test_name, transaction, wallet_addr):
+def reject_transaction(backend, navigator, test_name, transaction, wallet_addr):
     client = EthAppClient(backend)
     # Sign the transaction
     try:
         with client.sign(DERIVATION_PATH, transaction):
 
             # Navigate and compare depending on the device type
-            if firmware.is_nano:
+            if backend.device.is_nano:
                 navigator.navigate_and_compare(
                     ROOT_SCREENSHOT_PATH,
                     test_name,
@@ -112,7 +112,7 @@ def reject_transaction(backend, firmware, navigator, test_name, transaction, wal
     else:
         assert False
 
-def test_single_validator(backend, firmware, navigator, test_name, wallet_addr):
+def test_single_validator(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     withdrawal_credential = bytes.fromhex("010000000000000000000000" + wallet_addr.get().hex())
@@ -121,9 +121,9 @@ def test_single_validator(backend, firmware, navigator, test_name, wallet_addr):
 
     client.set_external_plugin(PLUGIN_NAME,contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr)
+    sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr)
 
-def test_single_validator_other_address(backend, firmware, navigator, test_name, wallet_addr):
+def test_single_validator_other_address(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     withdrawal_credential = bytes.fromhex("0100000000000000000000001384a8c0593e4f2faa5a1e47a618ca801abdb9cd")
@@ -132,10 +132,10 @@ def test_single_validator_other_address(backend, firmware, navigator, test_name,
 
     client.set_external_plugin(PLUGIN_NAME,contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr)
+    sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr)
 
 
-def test_single_validator_bls_credential(backend, firmware, navigator, test_name, wallet_addr):
+def test_single_validator_bls_credential(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     withdrawal_credential = bytes.fromhex("00efa784baf17175e94d9e338ab3b5c9bc3ce9bc9832939dd6756080812942c3")
@@ -144,10 +144,10 @@ def test_single_validator_bls_credential(backend, firmware, navigator, test_name
 
     client.set_external_plugin(PLUGIN_NAME,contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    reject_transaction(backend, firmware, navigator, test_name, transaction, wallet_addr)
+    reject_transaction(backend, navigator, test_name, transaction, wallet_addr)
 
 
-def test_multiple_validators(backend, firmware, navigator, test_name, wallet_addr):
+def test_multiple_validators(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     withdrawal_credential = bytes.fromhex("010000000000000000000000" + wallet_addr.get().hex())
@@ -158,9 +158,9 @@ def test_multiple_validators(backend, firmware, navigator, test_name, wallet_add
 
     client.set_external_plugin(PLUGIN_NAME, contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr)
+    sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr)
 
-def test_multiple_validators_different_withdrawal(backend, firmware, navigator, test_name, wallet_addr):
+def test_multiple_validators_different_withdrawal(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     withdrawal_credential = bytes.fromhex("0100000000000000000000002384a8c0593e4f2faa5a1e47a618ca801abdb9cd")
@@ -170,9 +170,9 @@ def test_multiple_validators_different_withdrawal(backend, firmware, navigator, 
 
     client.set_external_plugin(PLUGIN_NAME, contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr)
+    sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr)
 
-def test_multiple_validators_different_withdrawal_bls(backend, firmware, navigator, test_name, wallet_addr):
+def test_multiple_validators_different_withdrawal_bls(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     withdrawal_credential = bytes.fromhex("00efa784baf17175e94d9e338ab3b5c9bc3ce9bc9832939dd6756080812942c3")
@@ -182,9 +182,9 @@ def test_multiple_validators_different_withdrawal_bls(backend, firmware, navigat
 
     client.set_external_plugin(PLUGIN_NAME, contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    reject_transaction(backend, firmware, navigator, test_name, transaction, wallet_addr)
+    reject_transaction(backend, navigator, test_name, transaction, wallet_addr)
 
-def test_multiple_validators_multiple_mixed_withdrawal_addresses(backend, firmware, navigator, test_name, wallet_addr):
+def test_multiple_validators_multiple_mixed_withdrawal_addresses(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     address1 = bytes.fromhex("0100000000000000000000001384a8c0593e4f2faa5a1e47a618ca801abdb9cd")
@@ -198,9 +198,9 @@ def test_multiple_validators_multiple_mixed_withdrawal_addresses(backend, firmwa
 
     client.set_external_plugin(PLUGIN_NAME,contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    reject_transaction(backend, firmware, navigator, test_name, transaction, wallet_addr)
+    reject_transaction(backend, navigator, test_name, transaction, wallet_addr)
 
-def test_multiple_validators_multiple_mixed_withdrawal_addresses_bls_key(backend, firmware, navigator, test_name, wallet_addr):
+def test_multiple_validators_multiple_mixed_withdrawal_addresses_bls_key(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     address1 = bytes.fromhex("0100000000000000000000001384a8c0593e4f2faa5a1e47a618ca801abdb9cd")
@@ -214,4 +214,4 @@ def test_multiple_validators_multiple_mixed_withdrawal_addresses_bls_key(backend
 
     client.set_external_plugin(PLUGIN_NAME,contract.address,BATCH_DEPOSIT_SELECTOR)
 
-    reject_transaction(backend, firmware, navigator, test_name, transaction, wallet_addr)
+    reject_transaction(backend, navigator, test_name, transaction, wallet_addr)

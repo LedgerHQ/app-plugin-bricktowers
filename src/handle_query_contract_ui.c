@@ -15,8 +15,8 @@ static void set_screen_message(ethQueryContractUI_t *msg, const char *message) {
 static bool set_amount_screen(ethQueryContractUI_t *msg) {
     set_screen_title(msg, "Amount");
 
-    const uint8_t *eth_amount = msg->pluginSharedRO->txContent->value.value;
-    uint8_t eth_amount_size = msg->pluginSharedRO->txContent->value.length;
+    const uint8_t *eth_amount = msg->txContent->value.value;
+    uint8_t eth_amount_size = msg->txContent->value.length;
 
     // Converts the uint256 number located in `eth_amount` to its string representation and
     // copies this to `msg->msg`.
