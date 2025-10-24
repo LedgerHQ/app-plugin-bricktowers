@@ -52,8 +52,8 @@ def generate_claim_exited_assets(contract):
 
 def generate_update_state_data(contract):
     data = contract.encode_abi(
-        fn_name="updateState",
-        args=[(
+        "updateState",
+        [(
             bytes.fromhex("5688d11893321bbbac4e9921030e9ba9c2f3a75341dcb9c8b74531ec10b1a6c9"),  # rewardsRoot
             Web3.to_int(56911233836981101840),  # reward
             Web3.to_int(310305157213160780),  # unlockedMevReward
@@ -93,18 +93,18 @@ def generate_deposit_transaction(contract, receiver, referrer, amount):
     return generate_tx_params(data, amount)
 
 
-def sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr, selector):
+def sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr, selector):
     # Sign the transaction
     client.set_external_plugin(PLUGIN_NAME, contract.address, selector)
 
     with client.sign(DERIVATION_PATH, transaction):
 
         # Navigate and compare depending on the device type
-        if firmware.is_nano:
+        if backend.device.is_nano:
             navigator.navigate_until_text_and_compare(
                 NavInsID.RIGHT_CLICK,
                 [NavInsID.BOTH_CLICK],
-                "Accept",
+                "Sign transaction",
                 ROOT_SCREENSHOT_PATH,
                 test_name
             )
@@ -125,29 +125,29 @@ def sign_and_verify_transaction(client, firmware, navigator, test_name, transact
     assert addr == wallet_addr.get()
 
 
-def test_pooled_deposit(backend, firmware, navigator, test_name, wallet_addr):
+def test_pooled_deposit(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     address1 = bytes.fromhex("1384a8c0593e4f2faa5a1e47a618ca801abdb9cd")
 
     transaction = generate_deposit_transaction(contract, wallet_addr.get(), address1, 1.2)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr,
+    sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr,
                                 POOLED_DEPOSIT_SELECTOR)
 
 
-def test_pooled_simple_update_state(backend, firmware, navigator, test_name, wallet_addr):
+def test_pooled_simple_update_state(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     data = generate_update_state_data(contract)
 
     transaction = generate_tx_params(data, 0)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr,
+    sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr,
                                 POOLED_UPDATE_STATE_SELECTOR)
 
 # https://holesky.etherscan.io/tx/0xb0d0d48faed9011826efec4e4f3e34221c6986b2e040a37eab8dfb1920a9ad97
-def test_pooled_simple_multicall_deposit(backend, firmware, navigator, test_name, wallet_addr):
+def test_pooled_simple_multicall_deposit(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
     address1 = bytes.fromhex("1384a8c0593e4f2faa5a1e47a618ca801abdb9cd")
 
@@ -159,10 +159,10 @@ def test_pooled_simple_multicall_deposit(backend, firmware, navigator, test_name
     data = contract.encode_abi("multicall", [[data1, data2]])
     transaction = generate_tx_params(data, 1.2)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr,
+    sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr,
                                 POOLED_MULTICALL_SELECTOR)
 
-def test_pooled_simple_multicall_claim_exit(backend, firmware, navigator, test_name, wallet_addr):
+def test_pooled_simple_multicall_claim_exit(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     data1 = "0x" + POOLED_UPDATE_STATE_SELECTOR.hex() + generate_update_state_data(
@@ -172,5 +172,5 @@ def test_pooled_simple_multicall_claim_exit(backend, firmware, navigator, test_n
     data = contract.encode_abi("multicall", [[data1, data2]])
     transaction = generate_tx_params(data, 1.2)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr,
+    sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr,
                                 POOLED_MULTICALL_SELECTOR)

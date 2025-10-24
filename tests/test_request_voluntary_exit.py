@@ -52,16 +52,16 @@ def generate_request_voluntary_exit_transaction(contract, num_validators):
 
     return tx_params
 
-def sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr):
+def sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr):
     # Sign the transaction
     with client.sign(DERIVATION_PATH, transaction):
 
         # Navigate and compare depending on the device type
-        if firmware.is_nano:
+        if backend.device.is_nano:
             navigator.navigate_until_text_and_compare(
                 NavInsID.RIGHT_CLICK,
                 [NavInsID.BOTH_CLICK],
-                "Accept",
+                "Sign transaction",
                 ROOT_SCREENSHOT_PATH,
                 test_name
             )
@@ -82,21 +82,21 @@ def sign_and_verify_transaction(client, firmware, navigator, test_name, transact
     assert addr == wallet_addr.get()
 
 
-def test_request_single_validator(backend, firmware, navigator, test_name, wallet_addr):
+def test_request_single_validator(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     transaction = generate_request_voluntary_exit_transaction(contract, 1)
 
     client.set_external_plugin(PLUGIN_NAME,contract.address,REQUEST_VOLUNTARY_EXIT_SELECTOR)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr)
+    sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr)
 
 
-def test_request_multiple_validator(backend, firmware, navigator, test_name, wallet_addr):
+def test_request_multiple_validator(backend, navigator, test_name, wallet_addr):
     client = EthAppClient(backend)
 
     transaction = generate_request_voluntary_exit_transaction(contract, 3)
 
     client.set_external_plugin(PLUGIN_NAME,contract.address,REQUEST_VOLUNTARY_EXIT_SELECTOR)
 
-    sign_and_verify_transaction(client, firmware, navigator, test_name, transaction, wallet_addr)
+    sign_and_verify_transaction(client, backend, navigator, test_name, transaction, wallet_addr)
